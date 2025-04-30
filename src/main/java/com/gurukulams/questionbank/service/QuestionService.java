@@ -794,7 +794,8 @@ public class QuestionService {
                     + " where "
                     + "id IN (" + getQuestionIdFilter(categories) + ") "
                     + " order by id";
-            DataManager.SelectQuery<DataManager.Value<?, ?>, com.gurukulams.questionbank.model.Question> queryBuilder
+            DataManager.SelectQuery<DataManager.Value<?, ?>,
+                    com.gurukulams.questionbank.model.Question> queryBuilder
                     = this.questionStore.select()
                     .sql(query);
 
@@ -830,7 +831,8 @@ public class QuestionService {
                     + "(SELECT question_id FROM question_localized "
                     + "WHERE QUESTION_ID=q.ID AND LOCALE = ?))";
 
-            DataManager.SelectQuery<DataManager.Value<?, ?>, com.gurukulams.questionbank.model.Question> queryBuilder
+            DataManager.SelectQuery<DataManager.Value<?, ?>,
+                    com.gurukulams.questionbank.model.Question> queryBuilder
                     = this.questionStore.select()
                     .sql(query)
                     .param(QuestionLocalizedStore.locale(locale.getLanguage()))
