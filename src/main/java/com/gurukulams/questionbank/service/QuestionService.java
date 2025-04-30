@@ -194,7 +194,7 @@ public class QuestionService {
 
                 if (!extraMatch.isEmpty()) {
                     for (QuestionChoice eMatch : extraMatch) {
-                        Matches match = new Matches(id, eMatch.id(), null);
+                        Matches match = new Matches(id, null, eMatch.id());
                         matchesToCreate.add(match);
                     }
                 }
