@@ -194,7 +194,7 @@ public class QuestionService {
 
                 if (!extraMatch.isEmpty()) {
                     for (QuestionChoice eMatch : extraMatch) {
-                        Matches match = new Matches(id, eMatch.id(), null);
+                        Matches match = new Matches(id, null, eMatch.id());
                         matchesToCreate.add(match);
                     }
                 }
@@ -234,8 +234,7 @@ public class QuestionService {
 
     private com.gurukulams.questionbank.model.Question
     getQuestionModel(final String createdBy, final Question question) {
-        com.gurukulams.questionbank.model.Question questionModel
-                = new com.gurukulams.questionbank.model.Question(
+        return new com.gurukulams.questionbank.model.Question(
                 question.getId(),
                 question.getQuestion(),
                 question.getExplanation(),
@@ -245,9 +244,7 @@ public class QuestionService {
                 createdBy,
                 null,
                 null
-                );
-
-        return questionModel;
+        );
     }
 
     private Question
@@ -384,9 +381,9 @@ public class QuestionService {
 
             if (!isOwner) {
 
-                for (int i = 0; i < choices.size(); i++) {
-                    choices.set(i, choices.get(i).withIsAnswer(null));
-                }
+                choices
+                        .replaceAll(questionChoice
+                                -> questionChoice.withIsAnswer(null));
 
             }
             return choices;
@@ -539,7 +536,6 @@ public class QuestionService {
                     .filter(questionChoice -> !matches.contains(questionChoice))
                     .collect(Collectors.toList()));
 
-
         }
     }
 
@@ -634,7 +630,7 @@ public class QuestionService {
                             .collect(Collectors.joining(","))
                             + "))";
                     availableIds.add(0, id);
-                    QuestionChoiceLocalizedStore.DeleteStatement.DeleteQuery
+                    DataManager.Statement<DataManager.Value<?, ?>>
                             deleteChoiceLocalizedQuery
                             = this.questionChoiceLocalizedStore
                             .delete()
@@ -653,7 +649,7 @@ public class QuestionService {
                                     .collect(Collectors.joining(","))
                                     + ")";
                     availableIds.add(0, id);
-                    QuestionChoiceStore.DeleteStatement.DeleteQuery
+                    DataManager.Statement<DataManager.Value<?, ?>>
                             deleteChoiceQuery
                             = this.questionChoiceStore
                             .delete()
@@ -750,7 +746,8 @@ public class QuestionService {
                 .execute(this.dataSource);
 
         this.questionChoiceStore
-                .delete(QuestionChoiceStore.questionId().eq(questionId))
+                .delete()
+                    .where(QuestionChoiceStore.questionId().eq(questionId))
                 .execute(this.dataSource);
     }
 
@@ -764,7 +761,8 @@ public class QuestionService {
 
 
         this.matchesStore
-                .delete(MatchesStore.questionId().eq(questionId))
+                .delete()
+                    .where(MatchesStore.questionId().eq(questionId))
                 .execute(this.dataSource);
     }
 
@@ -796,7 +794,8 @@ public class QuestionService {
                     + " where "
                     + "id IN (" + getQuestionIdFilter(categories) + ") "
                     + " order by id";
-            QuestionStore.SelectStatement.SelectQuery queryBuilder
+            DataManager.SelectQuery<DataManager.Value<?, ?>,
+                    com.gurukulams.questionbank.model.Question> queryBuilder
                     = this.questionStore.select()
                     .sql(query);
 
@@ -832,7 +831,8 @@ public class QuestionService {
                     + "(SELECT question_id FROM question_localized "
                     + "WHERE QUESTION_ID=q.ID AND LOCALE = ?))";
 
-            QuestionStore.SelectStatement.SelectQuery queryBuilder
+            DataManager.SelectQuery<DataManager.Value<?, ?>,
+                    com.gurukulams.questionbank.model.Question> queryBuilder
                     = this.questionStore.select()
                     .sql(query)
                     .param(QuestionLocalizedStore.locale(locale.getLanguage()))
@@ -993,15 +993,18 @@ public class QuestionService {
 
 
         this.questionLocalizedStore
-                .delete(QuestionLocalizedStore.questionId().eq(questionId))
+                .delete()
+                    .where(QuestionLocalizedStore.questionId().eq(questionId))
                 .execute(this.dataSource);
 
         this.questionCategoryStore
-                .delete(QuestionCategoryStore.questionId().eq(questionId))
+                .delete()
+                    .where(QuestionCategoryStore.questionId().eq(questionId))
                 .execute(this.dataSource);
 
         this.questionStore
-                .delete(QuestionStore.id().eq(questionId)
+                .delete()
+                    .where(QuestionStore.id().eq(questionId)
                         .and().type().eq(questionType.toString()))
                 .execute(this.dataSource);
     }
@@ -1020,7 +1023,7 @@ public class QuestionService {
                                      final String categoryId)
             throws SQLException {
 
-        int noOfRowsInserted = 0;
+        int noOfRowsInserted;
 
         QuestionCategory questionCategory =
                 new QuestionCategory(questionId, categoryId);

@@ -5,6 +5,7 @@ import com.gurukulams.questionbank.payload.Question;
 import com.gurukulams.questionbank.payload.QuestionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -76,6 +77,17 @@ class MatchTheFollowingTest extends ChoseTheBestTest {
         Assertions.assertEquals(existingQuestions,
                 this.questionService.read(questionToUpdate.getId(),locale).get()
                         .getChoices().size());
+    }
+
+    @Test
+    void testExtraMatches() throws SQLException {
+        Question testQuestion = getTestQuestion();
+        QuestionChoice extraChoice = new QuestionChoice(null, null, "Universal Language",false);
+        testQuestion.getMatches().add(extraChoice);
+        Question question = super.testCreate(null);
+
+        Assertions.assertNotNull(question);
+        Assertions.assertNotNull(question.getId());
     }
 
     @Override
