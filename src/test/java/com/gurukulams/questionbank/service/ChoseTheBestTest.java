@@ -33,7 +33,7 @@ class ChoseTheBestTest extends QuestionServiceTest {
         QuestionChoice questionChoice = questionToUpdate.getChoices().get(0);
 
         UUID cId = questionChoice.id();
-        questionToUpdate.getChoices().set(0,questionChoice.withCValue(updatedQuestionTxt));
+        questionToUpdate.getChoices().set(0,questionChoice.withLabel(updatedQuestionTxt));
 
         this.questionService.update(questionToUpdate.getType(),
                 questionToUpdate.getId(),locale, questionToUpdate);
@@ -42,7 +42,7 @@ class ChoseTheBestTest extends QuestionServiceTest {
                 this.questionService.read(questionToUpdate.getId(),locale).get()
                     .getChoices().stream()
                     .filter(questionChoice1 -> questionChoice1.id().equals(cId))
-                    .findFirst().get().cValue());
+                    .findFirst().get().label());
 
         int existingQuestions = questionToUpdate.getChoices().size();
 
@@ -56,16 +56,16 @@ class ChoseTheBestTest extends QuestionServiceTest {
 
         QuestionChoice choiceReturned = this.questionService.read(questionToUpdate.getId(),locale).get()
                 .getChoices().stream()
-                .filter(questionChoice1 -> questionChoice1.cValue().equals(cValue))
+                .filter(questionChoice1 -> questionChoice1.label().equals(cValue))
                         .findFirst().get();
 
         Assertions.assertTrue(
-                choiceReturned.cValue().equals(cValue));
+                choiceReturned.label().equals(cValue));
 
         questionToUpdate.setChoices(this.questionService.read(questionToUpdate.getId(),locale)
                 .get()
                 .getChoices().stream()
-                .filter(questionChoice1 -> !questionChoice1.cValue().equals(cValue)).toList());
+                .filter(questionChoice1 -> !questionChoice1.label().equals(cValue)).toList());
 
         this.questionService.update(questionToUpdate.getType(),
                 questionToUpdate.getId(),locale, questionToUpdate);
@@ -80,7 +80,7 @@ class ChoseTheBestTest extends QuestionServiceTest {
     @Override
     String getCorrectAnswer(Question question) {
         return question.getChoices().stream()
-                .filter(QuestionChoice::isAnswer)
+                .filter(QuestionChoice::answer)
                 .findFirst()
                 .get()
                 .id().toString();
@@ -127,7 +127,7 @@ class ChoseTheBestTest extends QuestionServiceTest {
 
         // Question without Answer
         for (int i = 0; i < question.getChoices().size(); i++) {
-            question.getChoices().set(i, question.getChoices().get(i).withIsAnswer(false));
+            question.getChoices().set(i, question.getChoices().get(i).withAnswer(false));
         }
 
 

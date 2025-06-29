@@ -34,7 +34,7 @@ class MatchTheFollowingTest extends ChoseTheBestTest {
         QuestionChoice questionChoice = questionToUpdate.getChoices().get(0);
         UUID cId = questionChoice.id();
 
-        questionToUpdate.getChoices().set(0,questionChoice.withCValue(updatedQuestionTxt));
+        questionToUpdate.getChoices().set(0,questionChoice.withLabel(updatedQuestionTxt));
 
         this.questionService.update(questionToUpdate.getType(),
                 questionToUpdate.getId(),locale, questionToUpdate);
@@ -43,7 +43,7 @@ class MatchTheFollowingTest extends ChoseTheBestTest {
                 this.questionService.read(questionToUpdate.getId(),locale).get()
                         .getChoices().stream()
                         .filter(questionChoice1 -> questionChoice1.id().equals(cId))
-                        .findFirst().get().cValue());
+                        .findFirst().get().label());
 
         int existingQuestions = questionToUpdate.getChoices().size();
 
@@ -60,16 +60,16 @@ class MatchTheFollowingTest extends ChoseTheBestTest {
 
         QuestionChoice choiceReturned = this.questionService.read(questionToUpdate.getId(),locale).get()
                 .getChoices().stream()
-                .filter(questionChoice1 -> questionChoice1.cValue().equals(cValue))
+                .filter(questionChoice1 -> questionChoice1.label().equals(cValue))
                 .findFirst().get();
 
         Assertions.assertTrue(
-                choiceReturned.cValue().equals(cValue));
+                choiceReturned.label().equals(cValue));
 
         questionToUpdate.setChoices(this.questionService.read(questionToUpdate.getId(),locale)
                 .get()
                 .getChoices().stream()
-                .filter(questionChoice1 -> !questionChoice1.cValue().equals(cValue)).toList());
+                .filter(questionChoice1 -> !questionChoice1.label().equals(cValue)).toList());
 
         this.questionService.update(questionToUpdate.getType(),
                 questionToUpdate.getId(),locale, questionToUpdate);
@@ -138,7 +138,7 @@ class MatchTheFollowingTest extends ChoseTheBestTest {
         question.setQuestion("Match the Following");
 
         for (int i = 0; i < question.getChoices().size(); i++) {
-            question.getChoices().set(i, question.getChoices().get(i).withIsAnswer(false));
+            question.getChoices().set(i, question.getChoices().get(i).withAnswer(false));
         }
 
         question.setMatches(getMatches());
