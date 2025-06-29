@@ -22,15 +22,15 @@ CREATE TABLE question_localized (
 CREATE TABLE question_choice (
     id UUID PRIMARY KEY,
     question_id UUID NOT NULL,
-    c_value VARCHAR NOT NULL,
-    is_answer BOOLEAN,
+    "label" VARCHAR NOT NULL,
+    answer BOOLEAN,
     FOREIGN KEY (question_id) REFERENCES question (id)
 );
 
 CREATE TABLE question_choice_localized (
     choice_id UUID,
     locale VARCHAR(8) NOT NULL,
-    c_value VARCHAR NOT NULL,
+    "label" VARCHAR NOT NULL,
     FOREIGN KEY (choice_id) REFERENCES question_choice (id),
     PRIMARY KEY (choice_id, locale)
 );

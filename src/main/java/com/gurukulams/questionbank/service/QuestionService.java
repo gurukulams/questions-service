@@ -275,8 +275,8 @@ public class QuestionService {
 
         QuestionChoice choice = choiceToCrete.withId(choiceId);
         choice = choice.withQuestionId(questionId);
-        if (choice.isAnswer() == null) {
-            choice = choice.withIsAnswer(Boolean.FALSE);
+        if (choice.answer() == null) {
+            choice = choice.withAnswer(Boolean.FALSE);
         }
         this.questionChoiceStore.insert().values(choice)
                 .execute(this.dataSource);
@@ -308,7 +308,7 @@ public class QuestionService {
             throws SQLException {
         QuestionChoiceLocalized questionChoiceLocalized
                 = new QuestionChoiceLocalized(
-                        choice.id(), locale.getLanguage(), choice.cValue());
+                        choice.id(), locale.getLanguage(), choice.label());
 
         this.questionChoiceLocalizedStore
                 .insert()
@@ -322,7 +322,7 @@ public class QuestionService {
         int updatedRows = this.questionChoiceLocalizedStore
                 .update()
                 .set(QuestionChoiceLocalizedStore
-                        .cValue(choice.cValue()))
+                        .label(choice.label()))
                 .where(QuestionChoiceLocalizedStore
                         .choiceId().eq(choice.id())
                         .and(QuestionChoiceLocalizedStore
@@ -383,18 +383,18 @@ public class QuestionService {
 
                 choices
                         .replaceAll(questionChoice
-                                -> questionChoice.withIsAnswer(null));
+                                -> questionChoice.withAnswer(null));
 
             }
             return choices;
         } else {
             final String query =  "SELECT id,question_id,"
                     + "CASE WHEN qcl.LOCALE = ? "
-                    + "THEN qcl.c_value "
-                    + "ELSE qc.c_value "
-                    + "END AS c_value, "
-                    + (isOwner ? "is_answer" : "NULL")
-                    + " AS is_answer"
+                    + "THEN qcl.label "
+                    + "ELSE qc.label "
+                    + "END AS label, "
+                    + (isOwner ? "answer" : "NULL")
+                    + " AS answer"
                     + " FROM question_choice qc "
                     + "LEFT JOIN question_choice_localized qcl ON"
                     + " qc.ID = qcl.choice_id WHERE"
@@ -711,14 +711,14 @@ public class QuestionService {
         if (locale == null) {
             this.questionChoiceStore
                 .update()
-                .set(QuestionChoiceStore.cValue(choice.cValue()),
-                        QuestionChoiceStore.isAnswer(choice.isAnswer()))
+                .set(QuestionChoiceStore.label(choice.label()),
+                        QuestionChoiceStore.answer(choice.answer()))
                 .where(QuestionChoiceStore.id().eq(choice.id()))
                     .execute(this.dataSource);
         } else {
             this.questionChoiceStore
                 .update()
-                .set(QuestionChoiceStore.isAnswer(choice.isAnswer()))
+                .set(QuestionChoiceStore.answer(choice.answer()))
                 .where(QuestionChoiceStore.id().eq(choice.id()))
                     .execute(this.dataSource);
             saveLocalizedChoice(locale, choice);
@@ -946,8 +946,8 @@ public class QuestionService {
                             constraintDescriptor, elementType);
                     violations.add(violation);
                 } else if (choices.stream()
-                        .filter(choice -> choice.isAnswer() != null
-                                && choice.isAnswer())
+                        .filter(choice -> choice.answer() != null
+                                && choice.answer())
                         .findFirst().isEmpty()) {
                     ConstraintViolation<Question> violation
                             = ConstraintViolationImpl.forBeanValidation(
