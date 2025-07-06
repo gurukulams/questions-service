@@ -25,6 +25,7 @@ public class Question {
     /**
      * this is the explanation.
      */
+    @NotBlank(message = "explanation is mandatory")
     private String explanation;
 
     /**

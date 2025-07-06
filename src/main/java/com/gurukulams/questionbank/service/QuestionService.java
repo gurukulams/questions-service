@@ -51,6 +51,15 @@ public class QuestionService {
     public static final String OWNER_USER = "tom";
 
     /**
+     * Maximum Number of choices.
+     */
+    public static final int MAX_CHOICES = 5;
+    /**
+     * Minimum Number of choices.
+     */
+    public static final int MIN_CHOICES = 2;
+
+    /**
      * Validator.
      */
     private final Validator validator;
@@ -935,12 +944,13 @@ public class QuestionService {
                     .equals(QuestionType.CHOOSE_THE_BEST)) {
                 List<QuestionChoice> choices = question.getChoices();
                 if (choices == null
-                        || choices.size() < 2) {
+                        || choices.size() < MIN_CHOICES
+                        || choices.size() > MAX_CHOICES) {
                     ConstraintViolation<Question> violation
                             = ConstraintViolationImpl.forBeanValidation(
                             messageTemplate, messageParameters,
                             expressionVariables,
-                            "Minimum 2 choices",
+                            "Minimum 2 or Maximum 5 choices",
                             rootBeanClass,
                             question, leafBeanInstance, cValue, propertyPath,
                             constraintDescriptor, elementType);
