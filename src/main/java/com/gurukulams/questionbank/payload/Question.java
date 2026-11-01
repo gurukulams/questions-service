@@ -1,6 +1,8 @@
 package com.gurukulams.questionbank.payload;
 
 import com.gurukulams.questionbank.model.QuestionChoice;
+import com.gurukulams.questionbank.validation.QuestionRules;
+import com.gurukulams.questionbank.validation.ValidQuestion;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
@@ -10,6 +12,7 @@ import java.util.UUID;
 /**
  * The type Question.
  */
+@ValidQuestion(groups = QuestionRules.class)
 public class Question {
     /**
      * tells the id of question.

@@ -16,22 +16,16 @@ import com.gurukulams.questionbank.store.QuestionChoiceStore;
 import com.gurukulams.questionbank.store.QuestionLocalizedStore;
 import com.gurukulams.questionbank.store.QuestionStore;
 import com.gurukulams.questionbank.store.QuestionTagStore;
+import com.gurukulams.questionbank.validation.QuestionRules;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 import jakarta.validation.Validator;
-import jakarta.validation.metadata.ConstraintDescriptor;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 
 import javax.sql.DataSource;
-import java.lang.annotation.ElementType;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -887,101 +881,12 @@ public class QuestionService {
      * @param question
      * @return violations
      */
-    private Set<ConstraintViolation<Question>> getViolations(final Question
-                                                                     question) {
-        Set<ConstraintViolation<Question>> violations = new HashSet<>(validator
-                .validate(question));
+    private Set<ConstraintViolation<Question>> getViolations(
+            final Question question) {
+        Set<ConstraintViolation<Question>> violations =
+                validator.validate(question);
         if (violations.isEmpty()) {
-            final String messageTemplate = null;
-            final Class<Question> rootBeanClass = Question.class;
-            final Object leafBeanInstance = null;
-            final Object cValue = null;
-            final Path propertyPath = null;
-            final ConstraintDescriptor<?> constraintDescriptor = null;
-            final ElementType elementType = null;
-            final Map<String, Object> messageParameters = new HashMap<>();
-            final Map<String, Object> expressionVariables = new HashMap<>();
-
-            if (question.getType().equals(QuestionType.MATCH_THE_FOLLOWING)) {
-                List<QuestionChoice> choices = question.getChoices();
-                List<QuestionChoice> matches = question.getMatches();
-                if (choices == null || choices.isEmpty()) {
-                    ConstraintViolation<Question> violation
-                            = ConstraintViolationImpl.forBeanValidation(
-                            messageTemplate, messageParameters,
-                            expressionVariables,
-                            "No choices are provided",
-                            rootBeanClass,
-                            question, leafBeanInstance, cValue, propertyPath,
-                            constraintDescriptor, elementType);
-                    violations.add(violation);
-                }
-                if (matches == null || matches.isEmpty()) {
-                    ConstraintViolation<Question> violation
-                            = ConstraintViolationImpl.forBeanValidation(
-                            messageTemplate, messageParameters,
-                            expressionVariables,
-                            "No matches are provided",
-                            rootBeanClass,
-                            question, leafBeanInstance, cValue, propertyPath,
-                            constraintDescriptor, elementType);
-                    violations.add(violation);
-                }
-                if (violations.isEmpty() && choices.size() > matches.size()) {
-                    ConstraintViolation<Question> violation
-                            = ConstraintViolationImpl.forBeanValidation(
-                            messageTemplate, messageParameters,
-                            expressionVariables,
-                            "Not Enough Matches",
-                            rootBeanClass,
-                            question, leafBeanInstance, cValue, propertyPath,
-                            constraintDescriptor, elementType);
-                    violations.add(violation);
-                }
-
-            } else  if (question.getType().equals(QuestionType.MULTI_CHOICE)
-                    || question.getType()
-                    .equals(QuestionType.CHOOSE_THE_BEST)) {
-                List<QuestionChoice> choices = question.getChoices();
-                if (choices == null
-                        || choices.size() < MIN_CHOICES
-                        || choices.size() > MAX_CHOICES) {
-                    ConstraintViolation<Question> violation
-                            = ConstraintViolationImpl.forBeanValidation(
-                            messageTemplate, messageParameters,
-                            expressionVariables,
-                            "Minimum 2 or Maximum 5 choices",
-                            rootBeanClass,
-                            question, leafBeanInstance, cValue, propertyPath,
-                            constraintDescriptor, elementType);
-                    violations.add(violation);
-                } else if (choices.stream()
-                        .filter(choice -> choice.answer() != null
-                                && choice.answer())
-                        .findFirst().isEmpty()) {
-                    ConstraintViolation<Question> violation
-                            = ConstraintViolationImpl.forBeanValidation(
-                            messageTemplate, messageParameters,
-                            expressionVariables,
-                            "At-least One Answer should be available",
-                            rootBeanClass,
-                            question, leafBeanInstance, cValue, propertyPath,
-                            constraintDescriptor, elementType);
-                    violations.add(violation);
-                }
-            } else {
-                if (question.getAnswer() == null) {
-                    ConstraintViolation<Question> violation
-                            = ConstraintViolationImpl.forBeanValidation(
-                            messageTemplate, messageParameters,
-                            expressionVariables,
-                            "Answer should not be empty",
-                            rootBeanClass,
-                            question, leafBeanInstance, cValue, propertyPath,
-                            constraintDescriptor, elementType);
-                    violations.add(violation);
-                }
-            }
+            violations = validator.validate(question, QuestionRules.class);
         }
         return violations;
     }

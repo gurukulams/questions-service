@@ -3,7 +3,6 @@ module gurukulams.questionbank {
     requires java.sql;
     requires java.naming;
     requires jakarta.validation;
-    requires org.hibernate.validator;
     requires com.h2database;
 
     opens com.gurukulams.questionbank.service;
@@ -12,6 +11,7 @@ module gurukulams.questionbank {
 
     exports com.gurukulams.questionbank.service;
     exports com.gurukulams.questionbank.payload;
+    exports com.gurukulams.questionbank.validation;
     exports com.gurukulams.questionbank.model;
     exports com.gurukulams.questionbank;
 }
