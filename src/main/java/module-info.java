@@ -3,6 +3,7 @@ module gurukulams.questionbank {
     requires java.sql;
     requires java.naming;
     requires jakarta.validation;
+    requires org.hibernate.validator;
     requires com.h2database;
 
     opens com.gurukulams.questionbank.service;
