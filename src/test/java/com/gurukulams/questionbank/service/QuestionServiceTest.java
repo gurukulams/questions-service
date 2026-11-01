@@ -208,6 +208,44 @@ abstract class QuestionServiceTest {
 
     }
 
+    @Test
+    void testListLocalizedMapsAllColumns() throws SQLException {
+        Question questionToCreate = getTestQuestion();
+        List<String> categories = List.of("c1", "c2");
+
+        Question created = questionService.create(categories,
+                null,
+                questionToCreate.getType(),
+                Locale.FRENCH,
+                OWNER_USER,
+                questionToCreate).get();
+
+        // Reference values come from read(), which has its own (correct) query
+        Question expected = questionService
+                .read(created.getId(), Locale.FRENCH).get();
+
+        // Owner view: every column is mapped
+        List<Question> ownerList = questionService
+                .list(OWNER_USER, Locale.FRENCH, categories);
+        Assertions.assertEquals(1, ownerList.size());
+
+        Question listed = ownerList.get(0);
+        Assertions.assertEquals(expected.getId(), listed.getId());
+        Assertions.assertEquals(expected.getQuestion(), listed.getQuestion());
+        Assertions.assertEquals(expected.getExplanation(),
+                listed.getExplanation());
+        Assertions.assertEquals(expected.getAnswer(), listed.getAnswer());
+        Assertions.assertEquals(OWNER_USER, listed.getCreatedBy());
+        Assertions.assertNotNull(listed.getCreatedAt());
+        Assertions.assertEquals(expected.getCreatedAt(), listed.getCreatedAt());
+
+        // Non owner view: the answer must be hidden
+        List<Question> guestList = questionService
+                .list("NEW_USER", Locale.FRENCH, categories);
+        Assertions.assertEquals(1, guestList.size());
+        Assertions.assertNull(guestList.get(0).getAnswer());
+    }
+
     /**
      * Invalid Questions.
      * @return

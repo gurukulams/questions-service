@@ -824,9 +824,9 @@ public class QuestionService {
                     + "THEN ql.explanation "
                     + "ELSE q.explanation "
                     + "END AS explanation,"
-                    + "type, created_by,"
+                    + "type,"
                     + (isOwner ? "q.answer" : "NULL")
-                    + " AS answer"
+                    + " AS answer,"
                     + "created_at,created_by,"
                     + "modified_at,modified_by"
                     + " FROM "
