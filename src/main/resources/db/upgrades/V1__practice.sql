@@ -56,3 +56,25 @@ CREATE TABLE question_tag (
     PRIMARY KEY(question_id, tag_id),
     FOREIGN KEY (question_id) REFERENCES question (id)
 );
+
+-- 1. Create the exam table
+CREATE TABLE exam (
+  id UUID PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by VARCHAR(55) NOT NULL,
+  modified_at TIMESTAMP,
+  modified_by VARCHAR(200)
+);
+
+-- 2. Create the exam_questions junction table
+CREATE TABLE exam_questions (
+  exam_id UUID NOT NULL REFERENCES exam(id),
+  question_id UUID NOT NULL REFERENCES question(id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (exam_id, question_id)
+);
+
+-- 3. Add an index for performance when querying questions by exam or vice versa
+CREATE INDEX idx_exam_questions_question_id ON exam_questions(question_id);
